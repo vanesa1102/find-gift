@@ -147,6 +147,7 @@
 </head>
 
 <body>
+    <script src="auth.js"></script>
 
     <!-- Modal Introductorio -->
     <div class="modal fade" id="introModal" tabindex="-1" role="dialog" aria-labelledby="introModalLabel"
@@ -446,7 +447,9 @@
 
         // Muestra el modal introductorio cuando la página se carga
         $(document).ready(function () {
-            $('#introModal').modal('show');
+            if (sessionStorage.getItem('find-gift-auth') === 'ok') {
+                $('#introModal').modal('show');
+            }
         });
 
         initGrid();
