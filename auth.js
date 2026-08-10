@@ -104,10 +104,15 @@
         gate.remove();
         style.remove();
 
+        let attempts = 0;
         const tryShowIntro = () => {
-            if (window.jQuery && window.jQuery('#introModal').length) {
-                window.jQuery('#introModal').modal('show');
-            } else {
+            if (window.jQuery) {
+                if (window.jQuery('#introModal').length) {
+                    window.jQuery('#introModal').modal('show');
+                }
+                return;
+            }
+            if (attempts++ < 40) {
                 setTimeout(tryShowIntro, 50);
             }
         };

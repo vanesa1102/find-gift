@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aniversario</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #18122B;
+            --surface: #241b3d;
+            --accent: #D4ADFC;
+            --accent-deep: #5C469C;
+            --text: #F3E8FF;
+        }
+
+        body {
+            background:
+                radial-gradient(ellipse at top, #2a1f4a 0%, transparent 55%),
+                radial-gradient(ellipse at bottom, #1a0f2e 0%, var(--bg) 70%);
+            color: var(--text);
+            font-family: "Montserrat", sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px 16px 40px;
+            text-align: center;
+            gap: 12px;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            max-width: 420px;
+            opacity: 0.85;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        .wheel-wrap {
+            position: relative;
+            width: min(86vw, 340px);
+            height: min(86vw, 340px);
+            margin: 12px 0 28px;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 28px solid var(--accent);
+            z-index: 3;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 6px solid var(--accent);
+            box-shadow:
+                0 0 0 8px var(--accent-deep),
+                0 18px 40px rgba(0, 0, 0, 0.45);
+            transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 3px solid var(--accent);
+            z-index: 2;
+            box-shadow: 0 0 0 4px var(--accent-deep);
+        }
+
+        .segment-label {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 50%;
+            transform-origin: left center;
+            text-align: center;
+            font-size: clamp(0.65rem, 2.4vw, 0.8rem);
+            font-weight: 600;
+            color: #120c1f;
+            pointer-events: none;
+            padding-left: 18%;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-deep);
+            border-color: var(--accent);
+            color: var(--accent);
+            min-width: 160px;
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:active,
+        .btn-primary:focus,
+        .btn-primary:disabled {
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+            color: var(--bg) !important;
+            box-shadow: 0 0 0 .2rem rgba(167, 94, 241, 0.45);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.75;
+            cursor: not-allowed;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            background-color: var(--bg);
+            color: var(--accent);
+            border: 1px solid var(--accent-deep);
+        }
+
+        .modal-body {
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .modal-question {
+            font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+            font-weight: 600;
+            line-height: 1.35;
+            margin: 0 0 20px;
+        }
+
+        .modal-prize-image {
+            display: block;
+            max-width: 100%;
+            width: min(100%, 420px);
+            height: auto;
+            margin: 0 auto 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-actions .btn.selected {
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+            color: var(--bg) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="auth.js"></script>
+
+    <div class="page">
+        <h1>Feliz aniversario</h1>
+        <p class="subtitle">Gira la ruleta y descubre tu premio… aunque entre tú y yo, ya sé cómo termina.</p>
+
+        <div class="wheel-wrap">
+            <div class="pointer" aria-hidden="true"></div>
+            <div class="wheel" id="wheel"></div>
+            <div class="wheel-center" aria-hidden="true"></div>
+        </div>
+
+        <button type="button" id="spinBtn" class="btn btn-primary">Girar</button>
+    </div>
+
+    <audio id="kilometros" src="kilometros.mp3" preload="auto"></audio>
+
+    <div class="modal fade" id="prizeModal" tabindex="-1" role="dialog" aria-labelledby="prizeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="modal-question" id="prizeModalLabel">
+                        ¿Quieres ir a los Autenticos Caligaris conmigo?
+                    </p>
+                    <img id="modalImage" src="caligaris.webp" alt="Los Auténticos Caligaris" class="modal-prize-image">
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-primary" id="btnPlatea">Platea</button>
+                        <button type="button" class="btn btn-primary" id="btnTercerPiso">Tercer piso</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        const audio = document.getElementById('kilometros');
+
+        function playSong() {
+            audio.currentTime = 0;
+            audio.play().catch(function () {});
+        }
+
+        const segments = [
+            { label: 'Cena', color: '#F7C59F' },
+            { label: 'Viaje', color: '#E8B4F8' },
+            { label: 'Beso', color: '#B8F2E6' },
+            { label: 'Sorpresa', color: '#FFD6A5' },
+            { label: 'Abrazo', color: '#CDB4DB' },
+            { label: 'Concierto', color: '#A0C4FF' },
+            { label: 'Pizza', color: '#FFADAD' },
+            { label: 'Premio', color: '#FDFFB6' },
+        ];
+
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spinBtn');
+        const segmentAngle = 360 / segments.length;
+        let currentRotation = 0;
+        let spinning = false;
+
+        const gradient = segments
+            .map((seg, i) => {
+                const start = i * segmentAngle;
+                const end = start + segmentAngle;
+                return `${seg.color} ${start}deg ${end}deg`;
+            })
+            .join(', ');
+
+        wheel.style.background = `conic-gradient(from -${segmentAngle / 2}deg, ${gradient})`;
+
+        segments.forEach((seg, i) => {
+            const label = document.createElement('div');
+            label.className = 'segment-label';
+            label.textContent = seg.label;
+            const mid = i * segmentAngle;
+            label.style.transform = `rotate(${mid}deg) translateY(-50%)`;
+            wheel.appendChild(label);
+        });
+
+        function showPrize() {
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.55 }
+            });
+            playSong();
+            $('#prizeModal').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+        }
+
+        document.getElementById('btnPlatea').addEventListener('click', function () {
+            document.getElementById('btnPlatea').classList.add('selected');
+            document.getElementById('btnTercerPiso').style.display = 'none';
+            document.getElementById('modalImage').style.display = 'none';
+            document.getElementById('prizeModalLabel').textContent = 'Anotado ;)';
+        });
+
+        document.getElementById('btnTercerPiso').addEventListener('click', function () {
+            document.getElementById('btnTercerPiso').classList.add('selected');
+            document.getElementById('btnPlatea').style.display = 'none';
+            document.getElementById('modalImage').style.display = 'none';
+            document.getElementById('prizeModalLabel').textContent = 'Anotado ;)';
+        });
+
+        spinBtn.addEventListener('click', function () {
+            if (spinning) return;
+            spinning = true;
+            spinBtn.disabled = true;
+            spinBtn.textContent = 'Girando…';
+
+            const premioIndex = segments.findIndex((seg) => seg.label === 'Premio');
+            const targetCenter = (360 - premioIndex * segmentAngle) % 360;
+            const jitter = (Math.random() - 0.5) * (segmentAngle * 0.7);
+            const targetMod = (targetCenter + jitter + 360) % 360;
+
+            const currentMod = ((currentRotation % 360) + 360) % 360;
+            let delta = (targetMod - currentMod + 360) % 360;
+            const extraSpins = 5 + Math.floor(Math.random() * 3);
+            currentRotation += extraSpins * 360 + delta;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(function () {
+                spinning = false;
+                spinBtn.disabled = false;
+                spinBtn.textContent = 'Girar';
+                showPrize();
+            }, 4600);
+        });
+    </script>
+</body>
+
+</html>
